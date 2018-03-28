@@ -1,32 +1,14 @@
 //Caio Gonçalves Feiertag - 1510590
-#define LED1 10
-#define LED2 11
-#define LED3 12
-#define LED4 13
-#define KEY1 A1
-#define KEY2 A2
-#define KEY3 A3
-#define BUZZ 3
-#define MINUTE 60000
-#define LATCH_DIO 4
-#define CLK_DIO 7
-#define DATA_DIO 8
-typedef struct tempo{
-  int minute;
-  int hour;
-}Time;
-/* Segment byte maps for numbers 0 to 9 */
-const byte SEGMENT_MAP[] = {0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0X80,0X90};
-/* Byte maps to select digit 1 to 4 */
-const byte SEGMENT_SELECT[] = {0xF1,0xF2,0xF4,0xF8};
-//func
-void add_minute(Time * x);
+#include "trab1.h"
+//funçoes auxiliares 
+void add_minute(Time * x); 
 void add_hour(Time *x);
 void update_time(Time *x);
 void active_alarm();
 void deactive_alarm();
 void soneca();
 void WriteNumberToSegment(byte Segment, byte Value);
+/********************/
 //variaveis globais
 bool alarm=false;
 unsigned long old=0;
@@ -39,8 +21,16 @@ Time alarm_time;
 Time * display_time;
 int time1,time2;
 unsigned long old1,old2;
+/********************/
 int vLED[]={LED1,LED2,LED3,LED4};
+/* Segment byte maps for numbers 0 to 9 */
+const byte SEGMENT_MAP[] = {0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0X80,0X90};
+/* Byte maps to select digit 1 to 4 */
+const byte SEGMENT_SELECT[] = {0xF1,0xF2,0xF4,0xF8};
+/********************/
+
 void setup() {
+  //inicializa portas
   pinMode(BUZZ, OUTPUT);
   pinMode(KEY1,INPUT_PULLUP);
   pinMode(KEY2,INPUT_PULLUP);
@@ -52,23 +42,26 @@ void setup() {
     pinMode(vLED[i], OUTPUT);
     if(i!=0)digitalWrite(vLED[i],HIGH);
   }
-  Serial.begin(9600);
+  //inicializa variaveis globais
   clock_time.hour=0;
   clock_time.minute=0;
   alarm_time.hour=0;
   alarm_time.minute=0;
   display_time=&clock_time;
-  digitalWrite(BUZZ,1);
+  digitalWrite(BUZZ,1); 
 }
+
 void loop () {
-  digitalWrite(BUZZ,1);
+  digitalWrite(BUZZ,1); //"desbuga" o buzzer
   unsigned long now = millis();
   update_time(display_time);
   if (now >= old+MINUTE) {
+    //adiciona 1 minuto a cada 60000ms passados
     old = now;
     add_minute(&clock_time);
   }
   if (clock_time.hour==alarm_time.hour&&clock_time.minute==alarm_time.minute&&alarm==true) {
+    //se o alarme estiver ligado aciona troca para o modo 0 e liga o buzzer
     digitalWrite(vLED[mode],HIGH);
     mode=0;
     digitalWrite(vLED[mode],LOW);
@@ -76,6 +69,7 @@ void loop () {
     bool aux=true;
     tone(BUZZ,2000);
     if(digitalRead(KEY1)!=but1){
+      //"So mais 5 minutinhos"
       but1=!but1;
       if(but1==LOW){
         soneca();
@@ -84,10 +78,12 @@ void loop () {
     }
   }
   if(digitalRead(KEY1)!=but1){
+    //seta as variaveis que controlam o pressionamento de botao1
     but1=!but1;
     old1=now;
     time1=500;
     if(but1==LOW){
+      //realiza operaçoes relacionados ao botao1
       switch(mode){
         case 0 : // ativa alarme
           active_alarm();
@@ -102,10 +98,12 @@ void loop () {
   }
   else{
     if(but1==LOW){
+      //se continuar pressionado, acelera a "leitura do botao"
       if(now>=old1+time1){
         if(time1>120)
           time1*=0.85;
         old1=now;
+        //realiza operaçoes relacionados ao botao1
         switch(mode){
           case 0 : // ativa alarme
             active_alarm();
@@ -120,10 +118,12 @@ void loop () {
     }
   }
   if(digitalRead(KEY2)!=but2){
+    //seta as variaveis que controlam o pressionamento de botao2
     but2=!but2;
     old2=now;
     time2=500;
     if(but2==LOW){
+      //realiza operaçoes relacionados ao botao2
       switch(mode){
         case 0 : //desativa alarme
           deactive_alarm();
@@ -138,10 +138,12 @@ void loop () {
   }
   else{
     if(but2==LOW){
+      //se continuar pressionado, acelera a "leitura do botao"
       if(time2+old2<=now){
         if(time2>200)
           time2*=0.8;
         old2=now;
+        //realiza operaçoes relacionados ao botao2
         switch(mode){
           case 0 : //desativa alarme
             deactive_alarm();
@@ -156,9 +158,10 @@ void loop () {
     }
   }
   if(digitalRead(KEY3)!=but3){ 
-  //adiciona um minuto
+  //seta as variaveis que controlam o pressionamento de botao3
     but3=!but3;
     if(but3==LOW){
+      //troca o modo
       digitalWrite(vLED[mode],HIGH);
       mode++;
       if(mode>2)
