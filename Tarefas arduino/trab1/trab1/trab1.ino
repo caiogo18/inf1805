@@ -48,7 +48,6 @@ void setup() {
   alarm_time.hour=0;
   alarm_time.minute=0;
   display_time=&clock_time;
-  digitalWrite(BUZZ,1); 
 }
 
 void loop () {
@@ -66,7 +65,6 @@ void loop () {
     mode=0;
     digitalWrite(vLED[mode],LOW);
     display_time=&clock_time;
-    bool aux=true;
     tone(BUZZ,2000);
     if(digitalRead(KEY1)!=but1){
       //"So mais 5 minutinhos"
@@ -199,11 +197,9 @@ void active_alarm(){
 }
 void deactive_alarm(){
   alarm=false;
-  noTone(BUZZ);
   digitalWrite(LED4,HIGH);
 }
 void soneca(){
-  noTone(BUZZ);
   for(int i=0;i<5;i++)
     add_minute(&alarm_time);
 }
