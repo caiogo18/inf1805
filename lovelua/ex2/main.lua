@@ -1,7 +1,7 @@
 function newblip (vel)
   local x, y = 0, 0
   local function wait(self)
-    self.isactiveafter=os.clock()+vel/15
+    self.isactiveafter=os.clock()+vel/50
     coroutine.yield()
   end
   
@@ -9,7 +9,7 @@ function newblip (vel)
     update = coroutine.wrap(function (self)
       while(true) do
         local width, height = love.graphics.getDimensions( )
-        x = x+15
+        x = x+10
         if x > width then
         -- volta para a esquerda da janela
           x = 0
