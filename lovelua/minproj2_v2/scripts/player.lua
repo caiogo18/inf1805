@@ -58,6 +58,14 @@ function Player:move(up, down, left, right)
 	end
 end
 
+function Player:fire(shoot) -- corrotina p/ atirar; sincronizar disparos
+    local co = coroutine.create(function() shoot.atHand = false end);
+    if coroutine.status(co) == 'dead' then 
+        co = coroutine.create(function() shoot.atHand = false end)
+    end
+    coroutine.resume(co);
+end
+
 function Player:update(dt)
 	-- pressionar seta up
 	if love.keyboard.isDown('up') then
@@ -84,9 +92,11 @@ function Player:update(dt)
   					shoot.x = self.x + 10;			-- atualizar posicao de disparo
   					shoot.y = self.y;
   					self.shots = self.shots - 1;	-- atualizar numero de balas
-  					shoot.atHand = false; 			-- atirar    
+  					Player:fire(shoot); 			-- atirar    
   					self.shoot = shoot;
-  				end			
+  				else
+            coroutine.yield();
+          end			
   				break;
   			end
 		end

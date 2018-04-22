@@ -8,7 +8,7 @@ function Obstacle:create(x, y, width, height)
 	obst.y = y;
 	obst.width = width;			-- dimensoes width e height 
 	obst.height = height;
-	obst.resistance = 10; 
+	obst.resistance = 4; 
 	obst.color = {["r"] = 0 , ["g"] = 255, ["b"] = 255};
 	obst.visible = true;
 	obst.name = "obstacle";

@@ -42,6 +42,14 @@ function Enemy:draw()
 	end   
 end
 
+function Enemy:fire(shoot) -- corrotina p/ atirar; sincronizar disparos
+    local co = coroutine.create(function() shoot.atHand = false end);
+    if coroutine.status(co) == 'dead' then 
+        co = coroutine.create(function() shoot.atHand = false end)
+    end
+    coroutine.resume(co);
+end
+
 function Enemy:update(dt, dirX, dirY)       		-- direcao do disparo dirX, dirY
 	if self.visible then
 		-- atualizar os tiros disparados
@@ -49,18 +57,20 @@ function Enemy:update(dt, dirX, dirY)       		-- direcao do disparo dirX, dirY
 			shoot:update();		
   		end
   		-- atirar
-  		self.clock = self.clock + dt
+  		self.clock = self.clock + dt;
     	for i, shoot in ipairs(self.cartridge) do
   			-- disparar tiro
   			if shoot.atHand then
   				if self.clock >= shoot.delay then
-					self.clock = 0;
+				    self.clock = 0;
   					shoot.vX = self.gunX * dirX;	-- atualizar a direcao de disparo
   					shoot.vY = self.gunY * dirY;
   					self.shots = self.shots - 1;	-- atualizar numero de balas
-  					shoot.atHand = false; 			-- atirar			
+  					Enemy:fire(shoot); 			      -- atirar			
   					self.shoot = shoot;
-  				end
+  				else
+            coroutine.yield();
+          end
   				break;
   			end
 		end	
