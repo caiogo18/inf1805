@@ -1,3 +1,5 @@
+--Caio Gonçalves Feiertag 1510590
+--Leandro Morgado 1212042
 require "scripts.shoot";
 require "scripts.player";
 require "scripts.enemy";
